@@ -1,0 +1,12 @@
+#searchUI {
+  display: flex;
+  flex-direction: row;
+}
+
+#eventList {
+  
+}
+
+.searchEle {
+  margin-right: 8px;
+}
