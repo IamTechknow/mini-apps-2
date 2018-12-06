@@ -13,22 +13,39 @@ export default class App extends React.Component {
 
     this.onTypeChange = this.onTypeChange.bind(this);
     this.onInputChange = this.onInputChange.bind(this);
+    this.onSearchClicked = this.onSearchClicked.bind(this);
+    this.query = '';
   }
 
-  static getDataByYear(year) {
-    return fetch(`/events?year=${year}`)
-      .then(res => res.json())
-      .then(result => {
-
-      });
+  static getDataByDate(date) {
+    return fetch(`/events?date=${date}`)
+      .then(res => res.json());
   }
 
-  onTypeChange(type) {
-    this.setState({ type });
+  static getDataByText(text) {
+    return fetch(`/events?q=${text}`)
+      .then(res => res.json());
+  }
+
+  onTypeChange(mode) {
+    this.setState({ mode });
   }
 
   onInputChange(event) {
+    this.query = event.target.value;
+  }
 
+  onSearchClicked() {
+    const { mode } = this.state;
+    let promise = mode === DESCRIPTION ?
+      App.getDataByText(this.query) : App.getDataByDate(this.query);
+
+    promise
+      .then(events => {
+        this.setState({
+          events
+        });
+      });
   }
 
   render() {
@@ -39,20 +56,21 @@ export default class App extends React.Component {
         <div id="searchUI">
           <button type="button" className="searchEle" onClick={this.onTypeChange.bind(this, YEAR)}>Year</button>
           <button type="button" className="searchEle" onClick={this.onTypeChange.bind(this, DESCRIPTION)}>Description</button>
-          <input type="text" placeholder={ mode ? 'Search by text...' : 'Search by year...' } onChange={this.onInputChange} />
+          <input type="text" className="searchEle" placeholder={ mode ? 'Search by text...' : 'Search by year...' } onChange={this.onInputChange} />
+          <button type="button" onClick={this.onSearchClicked}>Search</button>
         </div>
         <div id="eventList">
           { events.length > 0
             ? (
               <ul>
-                events.map(obj => (
-                  <li>
+                {events.map(obj => (
+                  <li className="eventItem">
                     <p>{obj.date}</p>
                     <p>{obj.description}</p>
                   </li>
-                )
+                ))}
               </ul>
-            ): <h3>Historical events will show up here!</h3>  
+            ): <h3>Historical events will show up here!</h3>
           }
         </div>
       </div>
