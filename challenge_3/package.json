@@ -1,7 +1,7 @@
 {
-  "name": "cryptographer",
+  "name": "bowling-react",
   "version": "0.0.1",
-  "description": "View bitcoin to USD exchange rates over time",
+  "description": "Simulate a bowling game",
   "main": "index.js",
   "scripts": {
     "start": "node --inspect server.js",
@@ -10,7 +10,6 @@
   "author": "Edmond Lee",
   "license": "ISC",
   "dependencies": {
-    "chart.js": "^2.7.3",
     "express": "^4.16.4",
     "react": "^16.6.3",
     "react-dom": "^16.6.3"
