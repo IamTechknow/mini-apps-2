@@ -11,6 +11,8 @@ export default class App extends React.Component {
 
     };
     this.canvasRef = React.createRef();
+    this.onStartChange = this.onStartChange.bind(this);
+    this.onEndChange = this.onEndChange.bind(this);
   }
 
   static getCoinDeskData(start, end) {
@@ -73,6 +75,42 @@ export default class App extends React.Component {
         });
       });
   }
+  
+  onStartChange(event) {
+    this.setState({
+      startDate: event.target.value
+    });
+    this.getDataWithDates(event.target.value, this.state.endDate);
+  }
+  
+  onEndChange(event) {
+    this.setState({
+      endDate: event.target.value
+    });
+    this.getDataWithDates(this.state.startDate, event.target.value);
+  }
+  
+  getDataWithDates(start, end) {
+    const startDate = new Date(start), endDate = new Date(end);
+    
+    if (startDate.getTime() < endDate.getTime()) {
+      App.getCoinDeskData(start, end)
+        .then(result => {
+        let obj = result.bpi;
+        let dates = Object.keys(obj);
+        let data = [];
+
+        for (let key of dates) {
+          data.push(obj[key]);
+        }
+
+        this.setState({
+          dates,
+          data
+        });
+      });
+    }
+  }
 
   render() {
     const { dates, data, ctx } = this.state;
@@ -84,6 +122,10 @@ export default class App extends React.Component {
 
     return (
       <div>
+        <div id="dateContainer">
+          <input type="date" onChange={this.onStartChange} />
+          <input type="date" onChange={this.onEndChange} />
+        </div>
         <canvas ref={this.canvasRef} id="myChart" width="800" height="400"></canvas>
         <p>Powered by <a href="https://www.coindesk.com/price/">CoinDesk</a></p>
       </div>
