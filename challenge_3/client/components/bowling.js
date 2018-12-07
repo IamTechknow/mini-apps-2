@@ -30,10 +30,10 @@ export default class BowlingGame {
 
   visualizePins() {
     return [
-      [getCharForPin(1), getCharForPin(2), getCharForPin(3), getCharForPin(4)],
-      [getCharForPin(5), getCharForPin(6), getCharForPin(7)],
-      [getCharForPin(8), getCharForPin(9)],
-      [getCharForPin(10)]
+      [this.getCharForPin(1), this.getCharForPin(2), this.getCharForPin(3), this.getCharForPin(4)],
+      [this.getCharForPin(5), this.getCharForPin(6), this.getCharForPin(7)],
+      [this.getCharForPin(8), this.getCharForPin(9)],
+      [this.getCharForPin(10)]
     ];
   }
 
