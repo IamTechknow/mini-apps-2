@@ -10,7 +10,7 @@ export default class App extends React.Component {
     super(props);
 
     this.state = {
-
+      pins: []
     };
 
     this.game = new BowlingGame();
@@ -18,15 +18,26 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
-    
+    this.setState({
+      score: this.game.score,
+      frame: this.game.frame,
+      roll: this.game.roll,
+      pins: this.game.visualizePins()
+    });
   }
 
   onBtnClick(event) {
     this.game.rollBall(Number.parseInt(event.target.innerText, 10));
+    this.setState({
+      score: this.game.score,
+      frame: this.game.frame,
+      roll: this.game.roll,
+      pins: this.game.visualizePins()
+    });
   }
 
   render() {
-    const { name } = this.state;
+    const { name, pins, score, frame, roll } = this.state;
     const btnState = new Array(10);
 
     for(let i = 0; i < 10; i++) {
@@ -43,14 +54,22 @@ export default class App extends React.Component {
           <button type="button" onClick={ () => { this.setState({ name: this.name }); } }>Play!</button>
         </div>
       );
+    } else if(this.game.isGameDone()) {
+      return (
+        <div>
+          <p>Game over!</p>
+          <p>{`Your score is ${score}`}</p>
+          <button type="button" onClick={() => { this.game.reset(); this.componentDidMount(); }}>Play Again!</button>
+        </div>
+      );
     }
 
     return (
       <div id="gameGrid">
         <div id="controls">
-          <p>Score: {this.game.score}</p>
-          <p>Frame {this.game.frame}</p>
-          <p>Roll {this.game.roll}</p>
+          <p>Score: {score}</p>
+          <p>Frame {frame}</p>
+          <p>Roll {roll}</p>
 
           {
             btnState.map((state, i) => (
@@ -61,7 +80,7 @@ export default class App extends React.Component {
 
         <div id="visualizer">
         {
-          this.game.visualizePins().map(arr => (
+          pins.map(arr => (
             <div className="pinRow">
               {
                 arr.map(ele => (
