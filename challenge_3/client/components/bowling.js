@@ -9,20 +9,26 @@ export default class BowlingGame {
     this.roll = undefined;
     this.pinsUp = undefined;
     this.lastResult = undefined;
-    
+
     // TODO: Keep track of strikes and spares
+    this.currStrikes = new Set();
+    this.currSpares = new Set();
+    this.pinsHit = [];
 
     this.reset();
   }
 
   // Update all of the fields upon a roll
   rollBall(pinsToHit) {
+    this.pinsHit.push(pinsToHit);
     this.pinsUp -= pinsToHit;
     // Determine if a strike or spare has occurred
     if (this.roll === 1 && this.pinsUp === 0) {
       this.lastResult = STRIKE;
+      this.currStrikes.add(this.frame);
     } else if (this.roll === 2 && this.pinsUp === 0) {
       this.lastResult = SPARE;
+      this.currSpares.add(this.frame);
     } else if (this.roll === 2 && this.pinsUp >= 0){
       this.lastResult = OPEN;
     } else {
@@ -32,7 +38,8 @@ export default class BowlingGame {
     // Calculate score
     this.score += pinsToHit;
     
-    // TODO: Strikes and spares
+    // Process Strikes and spares
+    
     
     // Calculate frame or roll number
     if (this.lastResult >= STRIKE) {
@@ -49,7 +56,19 @@ export default class BowlingGame {
   }
 
   getCharForPin(pin) {
-    return MAX_PINS - this.pinsUp >= pin ? '*' : 'l' ;
+    return MAX_PINS - this.pinsUp >= pin ? '*' : 'l';
+  }
+  
+  getGameMessage() {
+    if (!this.lastResult) {
+      return "A bowling simulator";
+    }
+      
+    if (this.lastResult < STRIKE) {
+      return this.lastResult;
+    }
+
+    return this.lastResult === STRIKE ? "Strike!" : this.lastResult === SPARE ? "Spare!" : "Open!";
   }
 
   visualizePins() {

@@ -38,10 +38,11 @@ export default class App extends React.Component {
 
   render() {
     const { name, pins, score, frame, roll } = this.state;
-    const btnState = new Array(10);
+    const btnState = new Array(11);
+    btnState[0] = true;
 
-    for(let i = 0; i < 10; i++) {
-      btnState[i] = this.game.pinsUp > i;
+    for(let i = 1; i < 11; i++) {
+      btnState[i] = this.game.pinsUp > i - 1;
     }
 
     if(!name) {
@@ -65,31 +66,34 @@ export default class App extends React.Component {
     }
 
     return (
-      <div id="gameGrid">
-        <div id="controls">
-          <p>Score: {score}</p>
-          <p>Frame {frame}</p>
-          <p>Roll {roll}</p>
+      <div>
+        <h2>{this.game.getGameMessage()}</h2>
+        <div id="gameGrid">
+          <div id="controls">
+            <p>Score: {score}</p>
+            <p>Frame {frame}</p>
+            <p>Roll {roll}</p>
 
+            {
+              btnState.map((state, i) => (
+                <button type="button" disabled={!state} onClick={this.onBtnClick}>{i}</button>
+              ))
+            }
+          </div>
+
+          <div id="visualizer">
           {
-            btnState.map((state, i) => (
-              <button type="button" disabled={!state} onClick={this.onBtnClick}>{i + 1}</button>
+            pins.map(arr => (
+              <div className="pinRow">
+                {
+                  arr.map(ele => (
+                    <span className="pin">{ele}</span>
+                  ))
+                }
+              </div>
             ))
           }
-        </div>
-
-        <div id="visualizer">
-        {
-          pins.map(arr => (
-            <div className="pinRow">
-              {
-                arr.map(ele => (
-                  <span>{ele}</span>
-                ))
-              }
-            </div>
-          ))
-        }
+          </div>
         </div>
       </div>
     );
