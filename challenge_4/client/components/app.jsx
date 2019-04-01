@@ -1,28 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Difficulty from './difficulty';
+import { connect } from 'react-redux';
+import { openCell, flagCell, unflagCell, resetGame } from './actions/actions';
 
-const COVERED = 0, UNCOVERED = 1, FLAGGED = 2, MINE = 3;
-
-export default class App extends React.Component {
+class App extends React.Component {
   constructor(props) {
     super(props);
 
-    let defaultDiff = Difficulty.getDefaultDifficulty();
-    this.gameState = new Array(defaultDiff.width);
-    for (let i = 0; i < defaultDiff.width; i++) {
-      this.gameState[i] = new Array(defaultDiff.length).fill(COVERED);
-    }
-
-    this.state = {
-      flags: defaultDiff.flags,
-      width: defaultDiff.width,
-      height: defaultDiff.height,
-      gameState: this.gameState
-    };
-
-    this.onCellClick = this.onCellClick.bind(this);
+    this.openFunc = this.openFunc.bind(this);
   }
 
   static getStyles(cell) {
@@ -41,37 +27,63 @@ export default class App extends React.Component {
     }
   }
 
-  onCellClick(r, c, event) {
-    this.gameState[r][c] = UNCOVERED;
-    this.setState({
-      gameState: this.gameState
-    });
+  // Use a Higher order function to create callbacks for each cell
+  openFunc(r, c) {
+    return () => {
+      this.props.open(r, c);
+    };
   }
 
   render() {
-    const { flags, gameState } = this.state;
+    const { reset, currDiff, flagsLeft, gameBoard } = this.props;
 
     return (
       <div>
-        <span id="flags">{flags}</span>
+        <span id="flags">{`Flags: ${flagsLeft}`}</span>
 
         <div id="colGrid">
           {
-            gameState.map((arr, r) => (
+            gameBoard.map((arr, r) => (
               <div className="rowGrid">
                 {
-                  arr.map((cell, c) => {
-                    let classes = App.getStyles(cell);
-                    return (
-                      <div className={classes} onClick={this.onCellClick.bind(this, r, c)}></div>
-                    );
-                  })
+                  arr.map((cell, c) => (
+                    <div className={App.getStyles(cell)} onClick={this.openFunc(r, c)}></div>
+                  ))
                 }
               </div>
             ))
           }
         </div>
+
+        <button onClick={reset}>Reset</button>
       </div>
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    currDiff: state.currDiff,
+    flagsLeft: state.flagsLeft,
+    gameBoard: state.gameBoard
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    reset: () => {
+      dispatch(resetGame());
+    },
+    open: (r, c) => {
+      dispatch(openCell(r, c));
+    },
+    flag: (r, c) => {
+      dispatch(flagCell(r, c));
+    },
+    unflag: (r, c) => {
+      dispatch(unflagCell(r, c));
+    },
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
