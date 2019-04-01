@@ -12,11 +12,23 @@
   width: 20px;
   height: 20px;
 
-  background: #c0c0c0;
+  border: solid #808080;
+  border-width: 0 1px 1px 0;
   box-sizing: border-box;
 }
 
+.covered {
+  background: #c0c0c0;
+}
+
 .uncovered {
-  border: solid #808080;
-  border-width: 0 1px 1px 0;
+  background: lime;
+}
+
+.flag {
+  background: blue;
+}
+
+.mine {
+  background: red;
 }

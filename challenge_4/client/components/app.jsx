@@ -1,40 +1,67 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-const UNCOVERED = 0, CLICKED = 1, FLAGGED = 2;
+import Difficulty from './difficulty';
+
+const COVERED = 0, UNCOVERED = 1, FLAGGED = 2, MINE = 3;
 
 export default class App extends React.Component {
   constructor(props) {
     super(props);
+
+    let defaultDiff = Difficulty.getDefaultDifficulty();
+    this.gameState = new Array(defaultDiff.width);
+    for (let i = 0; i < defaultDiff.width; i++) {
+      this.gameState[i] = new Array(defaultDiff.length).fill(COVERED);
+    }
+
     this.state = {
-      flags: 10,
-      gridLength: 10
-    }
-    
-    this.gameState = new Array(this.state.flags);
-    for (let i = 0; i < this.state.flags; i++) {
-      this.gameState[i] = new Array(this.state.flags).fill(UNCOVERED);
-    }
-    
+      flags: defaultDiff.flags,
+      width: defaultDiff.width,
+      height: defaultDiff.height,
+      gameState: this.gameState
+    };
+
     this.onCellClick = this.onCellClick.bind(this);
   }
-  
-  onCellClick(r, c, event) {
-    
+
+  static getStyles(cell) {
+    switch(cell) {
+      case UNCOVERED:
+        return "cell uncovered";
+
+      case FLAGGED:
+        return "cell flag";
+
+      case MINE:
+        return "cell mine";
+
+      default:
+        return "cell covered";
+    }
   }
-  
+
+  onCellClick(r, c, event) {
+    this.gameState[r][c] = UNCOVERED;
+    this.setState({
+      gameState: this.gameState
+    });
+  }
+
   render() {
+    const { flags, gameState } = this.state;
+
     return (
       <div>
-        <span id="flags">{this.state.flags}</span>
-        
+        <span id="flags">{flags}</span>
+
         <div id="colGrid">
           {
-            this.gameState.map((arr, r) => (
+            gameState.map((arr, r) => (
               <div className="rowGrid">
                 {
                   arr.map((cell, c) => {
-                    let classes = cell === UNCOVERED ? 'cell uncovered' : 'cell';
+                    let classes = App.getStyles(cell);
                     return (
                       <div className={classes} onClick={this.onCellClick.bind(this, r, c)}></div>
                     );
