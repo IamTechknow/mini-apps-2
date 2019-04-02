@@ -27,6 +27,12 @@ export default (state = initialState, action) => {
     return state;
   }
 
+  // Don't flag cells if there's no more flags or open cell
+  if (action.type === FLAG_CELL && (flagsLeft === 0 ||
+    gameBoard[pair.r][pair.c] === 1)) {
+    return state;
+  }
+
   switch (action.type) {
     case OPEN_CELL:
       let { newBoard, gameStatus, cellsLeft } =
@@ -43,17 +49,17 @@ export default (state = initialState, action) => {
     case FLAG_CELL:
       return {
         ...state,
-        flagsLeft: flagsLeft -= 1,
+        flagsLeft: flagsLeft - 1,
         gameBoard: Helpers.flagCell(gameBoard, pair.r, pair.c),
-        gameStatus: `Flags remaining: ${flagsLeft}`
+        gameStatus: `Flags remaining: ${flagsLeft - 1}`
       };
 
     case UNFLAG_CELL:
       return {
         ...state,
-        flagsLeft: flagsLeft += 1,
+        flagsLeft: flagsLeft + 1,
         gameBoard: Helpers.unflagCell(gameBoard, pair.r, pair.c),
-        gameStatus: `Flags remaining: ${flagsLeft}`
+        gameStatus: `Flags remaining: ${flagsLeft + 1}`
       };
 
     case RESET_GAME:

@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { openCell, flagCell, unflagCell, resetGame } from './actions/actions';
 
 // Cell constants
-const COVERED = 0, UNCOVERED = 1, FLAGGED = 8, MINE = 3;
+const COVERED = 0, UNCOVERED = 1, FLAGGED = 8, MINE = 4, MINE_OPEN = 2;
 
 class App extends React.Component {
   constructor(props) {
@@ -19,13 +19,13 @@ class App extends React.Component {
       case UNCOVERED:
         return "cell uncovered";
 
-      case FLAGGED:
-        return "cell flag";
-
-      case MINE:
+      case MINE_OPEN:
         return "cell mine";
 
       default:
+        if (cell & FLAGGED === FLAGGED) {
+          return "cell flag";
+        }
         return "cell covered";
     }
   }
@@ -34,6 +34,20 @@ class App extends React.Component {
   openFunc(r, c) {
     return () => {
       this.props.open(r, c);
+    };
+  }
+
+  // Determine whether to flag or unflag
+  flagFunc(r, c, e) {
+    const { gameBoard, flag, unflag } = this.props;
+
+    return (event) => {
+      event.preventDefault();
+      if (gameBoard[r][c] & FLAGGED === FLAGGED) {
+        unflag(r, c);
+      } else {
+        flag(r, c);
+      }
     };
   }
 
@@ -50,7 +64,10 @@ class App extends React.Component {
               <div className="rowGrid">
                 {
                   arr.map((cell, c) => (
-                    <div className={App.getStyles(cell)} onClick={this.openFunc(r, c)}></div>
+                    <div
+                      className={App.getStyles(cell)}
+                      onClick={this.openFunc(r, c)}
+                      onContextMenu={this.flagFunc(r, c)}></div>
                   ))
                 }
               </div>

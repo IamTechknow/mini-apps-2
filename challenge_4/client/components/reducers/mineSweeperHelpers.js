@@ -1,5 +1,5 @@
 // Cell constants
-const COVERED = 0, UNCOVERED = 1, FLAGGED = 8, MINE = 3;
+const COVERED = 0, UNCOVERED = 1, FLAGGED = 8, MINE = 4, MINE_OPEN = 2;
 
 // Game status constants
 const GAME_ON = 0, GAME_NO_MINES = 1, MINE_TRIGGERED = 2, GAME_WON = 3;
@@ -14,8 +14,15 @@ export default class mineSweeperHelpers {
     let newBoard = mineSweeperHelpers.getBoard(board);
 
     // populate the board with mines when first cell is opened
-    if(mineSweeperHelpers.mineAt(newBoard, r, c)) {
-      newBoard[r][c] = MINE;
+    if (mineSweeperHelpers.mineAt(newBoard, r, c)) {
+      for (let currR = 0; currR < board.length; currR += 1) {
+        for (let currC = 0; currC < board[currR].length; currC += 1) {
+          if (mineSweeperHelpers.mineAt(newBoard, currR, currC)) {
+            newBoard[currR][currC] = MINE_OPEN;
+          }
+        }
+      }
+
       return { newBoard, gameStatus: MINE_TRIGGERED };
     } else {
       if (statusCode === GAME_NO_MINES) {
@@ -70,7 +77,7 @@ export default class mineSweeperHelpers {
 
   static mineAt(board, r, c) {
     return !(r < 0 || c < 0 || r >= board.length || c >= board[r].length)
-      && board[r][c] === MINE;
+      && ((board[r][c] & MINE) === MINE);
   }
 
   // Generate random number such that there's a 10% chance to place mine at specified location
@@ -84,7 +91,7 @@ export default class mineSweeperHelpers {
           if (Math.random() < 0.1) {
             if (r != playerR && c != playerC) {
               minesLeft--;
-              board[r][c] = MINE;
+              board[r][c] |= MINE; // Bitwise OR to account for flagged cell before first opening
             }
           }
 
