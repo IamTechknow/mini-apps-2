@@ -2,13 +2,13 @@
 const COVERED = 0, UNCOVERED = 1, FLAGGED = 8, MINE = 3;
 
 // Game status constants
-const GAME_ON = 0, MINE_TRIGGERED = 1, GAME_WON = 2, GAME_NO_MINES = 3;
+const GAME_ON = 0, GAME_NO_MINES = 1, MINE_TRIGGERED = 2, GAME_WON = 3;
 
 // Helper functions to manipulate the game model
 export default class mineSweeperHelpers {
-  static openCell(board, r, c, statusCode, diff) {
+  static openCell(board, r, c, statusCode, diff, cellsLeft) {
     if (board[r][c] === UNCOVERED) {
-      return { board, GAME_ON };
+      return { newBoard: board, gameStatus: GAME_ON, cellsLeft };
     }
 
     let newBoard = mineSweeperHelpers.getBoard(board);
@@ -16,14 +16,14 @@ export default class mineSweeperHelpers {
     // populate the board with mines when first cell is opened
     if(mineSweeperHelpers.mineAt(newBoard, r, c)) {
       newBoard[r][c] = MINE;
-      return { newBoard, MINE_TRIGGERED };
+      return { newBoard, gameStatus: MINE_TRIGGERED };
     } else {
       if (statusCode === GAME_NO_MINES) {
         newBoard = mineSweeperHelpers.populateMines(newBoard, diff.flags, r, c);
       }
 
-      mineSweeperHelpers.revealCells(newBoard, r, c);
-      return { newBoard, GAME_ON };
+      cellsLeft -= mineSweeperHelpers.revealCells(newBoard, r, c);
+      return { newBoard, gameStatus: cellsLeft <= 0 ? GAME_WON : GAME_ON, cellsLeft };
     }
   }
 

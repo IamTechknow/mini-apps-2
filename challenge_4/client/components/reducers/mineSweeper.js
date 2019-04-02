@@ -4,13 +4,14 @@ import Helpers from './mineSweeperHelpers';
 import Difficulty from '../difficulty';
 
 // Game status constants
-const GAME_ON = 0, MINE_TRIGGERED = 1, GAME_WON = 2, GAME_NO_MINES = 3;
+const GAME_ON = 0, GAME_NO_MINES = 1, MINE_TRIGGERED = 2, GAME_WON = 3;
 
 // Create initial state
 let currDiff = Difficulty.getDefaultDifficulty();
 
 const initialState = {
   currDiff,
+  cellsLeft: currDiff.width * currDiff.length - currDiff.flags,
   flagsLeft: currDiff.flags,
   gameBoard: Helpers.newBoard(currDiff),
   gameStatus: `Flags remaining: ${currDiff.flags}`,
@@ -21,13 +22,19 @@ export default (state = initialState, action) => {
   let pair = action.payload;
   const { gameBoard, flagsLeft } = state;
 
+  // If game is over, then don't let cell actions do anything
+  if (action && state.statusCode > GAME_NO_MINES && (action.type === OPEN_CELL || action.type === FLAG_CELL || action.type === UNFLAG_CELL)) {
+    return state;
+  }
+
   switch (action.type) {
     case OPEN_CELL:
-      let { newBoard, gameStatus } =
-        Helpers.openCell(gameBoard, pair.r, pair.c, state.statusCode, state.currDiff);
+      let { newBoard, gameStatus, cellsLeft } =
+        Helpers.openCell(gameBoard, pair.r, pair.c, state.statusCode, state.currDiff, state.cellsLeft);
 
       return {
         ...state,
+        cellsLeft: cellsLeft,
         gameBoard: newBoard,
         gameStatus: Helpers.getGameStatus(gameStatus, flagsLeft),
         statusCode: gameStatus
@@ -52,6 +59,7 @@ export default (state = initialState, action) => {
     case RESET_GAME:
       return {
         ...state,
+        cellsLeft: currDiff.width * currDiff.length - currDiff.flags,
         flagsLeft: state.currDiff.flags,
         gameBoard: Helpers.newBoard(state.currDiff),
         gameStatus: `Flags remaining: ${currDiff.flags}`,
