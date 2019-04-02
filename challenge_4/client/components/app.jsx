@@ -4,6 +4,9 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import { openCell, flagCell, unflagCell, resetGame } from './actions/actions';
 
+// Cell constants
+const COVERED = 0, UNCOVERED = 1, FLAGGED = 8, MINE = 3;
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -35,11 +38,11 @@ class App extends React.Component {
   }
 
   render() {
-    const { reset, currDiff, flagsLeft, gameBoard } = this.props;
+    const { reset, currDiff, gameStatus, gameBoard } = this.props;
 
     return (
       <div>
-        <span id="flags">{`Flags: ${flagsLeft}`}</span>
+        <span id="status">{gameStatus}</span>
 
         <div id="colGrid">
           {
@@ -55,7 +58,7 @@ class App extends React.Component {
           }
         </div>
 
-        <button onClick={reset}>Reset</button>
+        <button onClick={reset}>New Game</button>
       </div>
     );
   }
@@ -64,8 +67,8 @@ class App extends React.Component {
 const mapStateToProps = (state) => {
   return {
     currDiff: state.currDiff,
-    flagsLeft: state.flagsLeft,
-    gameBoard: state.gameBoard
+    gameBoard: state.gameBoard,
+    gameStatus: state.gameStatus
   };
 };
 
